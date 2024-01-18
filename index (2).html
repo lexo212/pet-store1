@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <title> ANA Üpet Store</title>
+  <style>
+    .input-container {
+      float: right;
+    }
+
+    #cardContainer {
+      float: left;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Welcome To Our PetStore</span>
+    </div>
+  </nav>
+
+  <p></p>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-4 input-container">
+      <div class="mt-3">
+        <label for="cardTitle">PetsName</label>
+        <input type="text" id="cardTitle" class="form-control" placeholder="Enter card title">
+      </div>
+
+      <div class="mt-3">
+        <label for="cardText">Pet type</label>
+        <textarea id="cardText" class="form-control" placeholder="Enter card text"></textarea>
+      </div>
+
+      <div class="mt-3">
+        <label for="cardImage">Pets image</label>
+        <input type="file" id="cardImage" class="form-control">
+      </div>
+
+      <button id="addCardBtn" class="btn btn-primary mt-3">Add Pet</button>
+    </div>
+
+    <div id="cardContainer" class="col-md-4"></div>
+  </div>
+</div>
+
+<script>
+  function createCard(title, text, imageUrl) {
+    return new Promise((resolve, reject) => {
+      let card = document.createElement('div');
+      card.className = 'card m-2';
+      
+      let cardBody = document.createElement('div');
+      cardBody.className = 'card-body';
+
+      let cardTitleElement = document.createElement('h5');
+      cardTitleElement.className = 'card-title';
+      cardTitleElement.textContent = title;
+
+      let cardTextElement = document.createElement('p');
+      cardTextElement.className = 'card-text';
+      cardTextElement.textContent = text;
+
+      let cardImageElement = document.createElement('img');
+      cardImageElement.className = 'card-img-top';
+
+      cardImageElement.onload = () => {
+        cardBody.appendChild(cardTitleElement);
+        cardBody.appendChild(cardTextElement);
+        card.appendChild(cardImageElement);
+        card.appendChild(cardBody);
+        resolve(card);
+      };
+
+      cardImageElement.onerror = () => {
+        reject(new Error('Error loading image'));
+      };
+
+      cardImageElement.src = imageUrl;
+    });
+  }
+
+  function addCard() {
+    let cardTitleInput = document.getElementById('cardTitle');
+    let cardTextInput = document.getElementById('cardText');
+    let cardImageInput = document.getElementById('cardImage');
+
+    let title = cardTitleInput.value.trim();
+    let text = cardTextInput.value.trim();
+    let imageFile = cardImageInput.files[0];
+
+    if (title && text && imageFile) {
+      let imageUrl = URL.createObjectURL(imageFile);
+
+      createCard(title, text, imageUrl)
+        .then((newCard) => {
+          let cardContainer = document.getElementById('cardContainer');
+          cardContainer.insertBefore(newCard, cardContainer.firstChild); 
+
+          cardTitleInput.value = '';
+          cardTextInput.value = '';
+          cardImageInput.value = ''; 
+        })
+        .catch((error) => {
+          console.error(error.message);
+        });
+    } else {
+      alert('Please enter both card title, text, and select an image.');
+    }
+  }
+
+  // Event listener for the "Add Card" button
+  let addCardBtn = document.getElementById('addCardBtn');
+  addCardBtn.addEventListener('click', addCard);
+</script>
+
+</body>
+</html>
